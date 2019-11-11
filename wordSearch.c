@@ -49,6 +49,23 @@ void allignSecondParallelDiagonal(const char *Grid, const int iniRow, const int 
     return;
 }
 
+void gridPlot(const char *Grid){
+    int i, j;
+    for(i = 0; i < 20; i++){
+        for(j = 0; j < 20; j++)
+            printf("%c", Grid + 20*i + j);
+        puts("\n");
+    }return;
+}
+
+void gridFiller(char *Grid){
+    int i, j;
+    for(i = 0; i < 20; i++)
+        for(j = 0; j < 20; j++)
+            *(Grid + 20*i + j) = '.';
+    return;
+}
+
 void horizontalWordPlacer(char *Grid, const char *String, const int row){
     int limit = 20 - strlen(String), iniColumn, i;
     time_t t;
