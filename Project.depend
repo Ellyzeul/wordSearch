@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1573679890 source:c:\users\gabriel\desktop\wordsearch\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"wordSearch.h"
+
+1573679387 c:\users\gabriel\desktop\wordsearch\wordsearch.h
+
+1573679953 source:c:\users\gabriel\desktop\wordsearch\wordsearch.c
+	"wordSearch.h"
+	<string.h>
+	<stdio.h>
+	<time.h>
+
