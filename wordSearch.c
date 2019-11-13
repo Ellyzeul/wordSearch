@@ -3,6 +3,13 @@
 #include <stdio.h>
 #include <time.h>
 
+typedef struct EXCEPT *except;
+struct EXCEPT{
+    int info;
+    except next;
+};
+
+
 void reverseString(const  char *Str, char *Rev){
     int i, tam = strlen(Str), lim = tam -1;
     for (i = 0; i < tam; i++)
@@ -53,7 +60,7 @@ void gridPlot(const char *Grid){
     int i, j;
     for(i = 0; i < 20; i++){
         for(j = 0; j < 20; j++)
-            printf("%c", Grid + 20*i + j);
+            printf(" %c ", *(Grid + 20*i + j));
         puts("\n");
     }return;
 }
@@ -61,18 +68,57 @@ void gridPlot(const char *Grid){
 void gridFiller(char *Grid){
     int i, j;
     for(i = 0; i < 20; i++)
-        for(j = 0; j < 20; j++)
+        for(j = 0; j < 20; j++){
             *(Grid + 20*i + j) = '.';
+        }
     return;
 }
 
-void horizontalWordPlacer(char *Grid, const char *String, const int row){
-    int limit = 20 - strlen(String), iniColumn, i;
-    time_t t;
-    srand((unsigned)t);
+int horizontalWordPlacer(char *Grid, const char *String, const int *exceptList){
+    int limit = 20 - strlen(String), iniColumn, i = 0, row, key, aux;
+    srand(time(NULL));
+    do{
+        row = rand()%20;
+        for(aux = 0; aux < 4; aux++){
+            if(row == *(exceptList + aux)){
+                key = 1;
+                break;
+            }else
+                key = 0;
+        }
+    }while(key);
     iniColumn = rand()%limit;
-    for(i = 0; *(String + i) != '\0'; i++)
+    while(*(String + i) != '\0'){
+        if(*(Grid + 20*row + iniColumn + i) != '.' && *(Grid + 20*row + iniColumn + i) != *(String + i)){
+            i = 0;
+            iniColumn = rand()%limit;
+        }i++;
+    }for(i = 0; *(String + i) != '\0'; i++)
         *(Grid + 20*row + iniColumn + i) = *(String + i);
-    return;
+    return(row);
+}
+
+int verticalWordPlacer(char *Grid, const char *String, const int *exceptList){
+    int limit = 20 - strlen(String), iniRow, i = 0, column, key, aux;
+    srand(time(NULL));
+    do{
+        column = rand()%20;
+        for(aux = 0; aux < 4; aux++){
+            if(column == *(exceptList + aux)){
+                key = 1;
+                break;
+            }else
+                key = 0;
+        }
+    }while(key);
+    iniRow = rand()%limit;
+    while(*(String + i) != '\0'){
+        if(*(Grid + 20*(iniRow + i) + column) != '.' && *(Grid + 20*(iniRow + i) + column) != *(String + i)){
+            i = 0;
+            iniRow = rand()%limit;
+        }i++;
+    }for(i = 0; *(String + i) != '\0'; i++)
+        *(Grid + 20*(iniRow + i) + column) = *(String + i);
+    return(column);
 }
 

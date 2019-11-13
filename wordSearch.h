@@ -8,6 +8,6 @@ void allignFirstParallelDiagonal(const char *Grid, const int iniRow, const int i
 void allignSecondParallelDiagonal(const char *Grid, const int iniRow, const int iniCol, char *String);
 void gridPlot(const char *Grid);
 void gridFiller(char *Grid);
-void horizontalWordPlacer(char *Grid, const char *String, const int row);
+int horizontalWordPlacer(char *Grid, const char *String, const int *exceptList);
 
 #endif // WORDSEARCH_H_INCLUDED

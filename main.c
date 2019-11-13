@@ -4,53 +4,26 @@
 #include <time.h>
 #include "wordSearch.h"
 
-void gridPlot(const char *Grid){
-    int i, j;
-    for(i = 0; i < 20; i++){
-        for(j = 0; j < 20; j++)
-            printf(" %c ", *(Grid + 20*i + j));
-        puts("\n");
-    }return;
-}
-
-void gridFiller(char *Grid){
-    int i, j;
-    for(i = 0; i < 20; i++)
-        for(j = 0; j < 20; j++){
-            if(j == 10)
-                *(Grid + 20*i + j) = 'z';
-            else
-                *(Grid + 20*i + j) = ' ';
-        }
-    return;
-}
-
-void horizontalWordPlacer(char *Grid, const char *String, const int except){
-    int limit = 20 - strlen(String), iniColumn, i, row = -1;
-    srand(time(NULL));
-    do{
-        row = rand()%20;
-    }while(row == except);
-    iniColumn = rand()%limit;
-    for(i = 0; *(String + i) != '\0'; i++){
-        if(*(Grid + 20*row + iniColumn + i) != ' ' && *(Grid + 20*row + iniColumn + i) != *(String + i)){
-            for(i--; i >= 0; i--)
-                *(Grid + 20*row + iniColumn + i) = ' ';
-            iniColumn = rand()%limit;
-        }
-        *(Grid + 20*row + iniColumn + i) = *(String + i);
-    }
-    return;
-}
-
 
 
 int main(void){
+    int exceptList[4] = {20, 20, 20, 20};
     char Grid[20][20];
     char *Nomes[20] = {"ANA", "ROBERTO", "CLAUDIA", "CARLOS", "ROGERIO", "PEDRO", "JULIA", "MARCOS", "JOAO", "MARILIA",
                        "GABRIEL", "FELIPE", "SARA", "ALICE", "BRUNA", "GERALDO", "DAYANA", "LOREN", "LEANDRO", "MILLENA"};
     gridFiller(Grid);
-    horizontalWordPlacer(Grid, *(Nomes + 19), 20);
+    exceptList[0] = horizontalWordPlacer(Grid, *(Nomes), exceptList);
+    exceptList[1] = horizontalWordPlacer(Grid, *(Nomes + 1), exceptList);
+    exceptList[2] = horizontalWordPlacer(Grid, *(Nomes + 2), exceptList);
+    exceptList[3] = horizontalWordPlacer(Grid, *(Nomes + 3), exceptList);
+    exceptList[0] = 20;
+    exceptList[1] = 20;
+    exceptList[2] = 20;
+    exceptList[3] = 20;
+    exceptList[0] = verticalWordPlacer(Grid, *(Nomes + 4), exceptList);
+    exceptList[1] = verticalWordPlacer(Grid, *(Nomes + 5), exceptList);
+    exceptList[2] = verticalWordPlacer(Grid, *(Nomes + 6), exceptList);
+    exceptList[3] = verticalWordPlacer(Grid, *(Nomes + 7), exceptList);
     gridPlot(Grid);
     system("Pause");
     return(0);
