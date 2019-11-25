@@ -6,6 +6,9 @@
 #ifndef WORDSEARCH_H_INCLUDED
 #define WORDSEARCH_H_INCLUDED
 
+
+
+
 void reverseString(const char *Str, char *Rev);
 
 _Bool patternMatch(const char *String, const char *Search, int *iniIndex);
@@ -17,12 +20,19 @@ void transposeColumn(const char *Grid, const int iniCol, char *String);
 void gridPlot(const char *Grid);
 void gridDotFiller(char *Grid);
 void gridCharFiller(char *Grid);
+void gridCopy(const char *Grid, char *Copy);
 
 int horizontalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset);
 int verticalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset);
 int firstDiagonalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset);
 int secondDiagonalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset);
-void resetList(int *List);
+void resetList(int *List, const int Dim);
+
+int randomWord(int *usedWords);
+_Bool confirm(const char *String);
+_Bool charToInt(const char *String, int *num);
+void numValidate(int *var, const char *msg);
+
 
 
 void reverseString(const  char *Str, char *Rev){
@@ -92,7 +102,7 @@ void gridPlot(const char *Grid){
     for(i = 0; i < 20; i++){
         for(j = 0; j < 21; j++){
             if(j == 20)
-                printf("  %-d ", i + 1);
+                printf("%4d", i + 1);
             else
                 printf(" %c ", *(Grid + 20*i + j));
         }
@@ -123,6 +133,14 @@ void gridCharFiller(char *Grid){
             if(*(Grid + 20*i + j) == '.')
                 *(Grid + 20*i + j) = rand()%26 + 65;
         }
+    return;
+}
+
+void gridCopy(const char *Grid, char *Copy){
+    int i, j;
+    for(i = 0; i < 20; i++)
+        for(j = 0; j < 20; j++)
+            *(Copy + 20*i + j) = *(Grid + 20*i + j);
     return;
 }
 
@@ -249,12 +267,65 @@ int secondDiagonalWordPlacer(char *Grid, const char *String, const int *exceptLi
     return(iniRow + iniColumn);
 }
 
-void resetList(int *List){
+void resetList(int *List, const int Dim){
     int i;
-    for(i = 0; i < 8; i++){
-        *(List + 20) = 20;
+    for(i = 0; i < Dim; i++){
+        *(List + i) = 20;
     }return;
 }
 
+int globalCont = 0;
+
+int randomWord(int *usedWords){
+    int i, wordPlace, key;
+    srand(time(NULL));
+    do{
+        wordPlace = (unsigned)rand()%20;
+        for(i = 0; i < 20; i++){
+            if(wordPlace == *(usedWords + i)){
+                key = 1;
+                break;
+            }else
+                key = 0;
+        }
+    }while(key);
+    *(usedWords + globalCont) = wordPlace;
+    globalCont++;
+    return(wordPlace);
+}
+
+_Bool confirm(const char *String){
+    char ch;
+    do{
+        system("cls");
+        puts(String);
+        ch = getchar();
+    }while(ch != 's' && ch != 'n' && ch != 'S' && ch != 'N');
+    if(ch == 's' || ch == 'S')
+        return(1);
+    else
+        return(0);
+}
+
+_Bool charToInt(const char *String, int *num){
+    int i;
+    *num = 0;
+    for(i = 0; *(String + i) != '\0'; i++){
+        if(*(String + i) < 48 || *(String + i) > 57)
+            return(0);
+        *num *= 10;
+        *num += *(String + i) - 48;
+    }return(1);
+}
+
+void numValidate(int *var, const char *msg){
+    char ch[1];
+    do{
+        system("cls");
+        puts(msg);
+        gets(ch);
+    }while(!charToInt(ch, var));
+    return;
+}
 
 #endif // WORDSEARCH_H_INCLUDED
