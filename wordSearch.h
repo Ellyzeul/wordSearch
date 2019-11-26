@@ -15,7 +15,9 @@ _Bool patternMatch(const char *String, const char *Search, int *iniIndex);
 void allignFirstDiagonal(const char *Grid, const int iniRow, const int iniCol, char *String);
 void allignSecondDiagonal(const char *Grid, const int iniRow, const int iniCol, char *String);
 void transposeRow(const char *Grid, const int iniRow, char *String);
+void transposeReverseRow(const char *Grid, const int iniRow, char *String);
 void transposeColumn(const char *Grid, const int iniCol, char *String);
+void transposeReverseColumn(const char *Grid, const int iniCol, char *String);
 
 void gridPlot(const char *Grid);
 void gridDotFiller(char *Grid);
@@ -28,7 +30,7 @@ int firstDiagonalWordPlacer(char *Grid, const char *String, const int *exceptLis
 int secondDiagonalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset);
 void resetList(int *List, const int Dim);
 
-int randomWord(int *usedWords);
+int randomWord(int *usedWords, const int reset);
 _Bool confirm(const char *String);
 _Bool charToInt(const char *String, int *num);
 void numValidate(int *var, const char *msg);
@@ -89,10 +91,26 @@ void transposeRow(const char *Grid, const int iniRow, char *String){
     return;
 }
 
+void transposeReverseRow(const char *Grid, const int iniRow, char *String){
+    int i;
+    for(i = 0; i < 20; i++)
+        *(String + i) = *(Grid + 20*iniRow + 19 - i);
+    *(String + i) = '\0';
+    return;
+}
+
 void transposeColumn(const char *Grid, const int iniCol, char *String){
     int i;
     for(i = 0; i < 20; i++)
         *(String + i) = *(Grid + 20*i + iniCol);
+    *(String + i) = '\0';
+    return;
+}
+
+void transposeReverseColumn(const char *Grid, const int iniCol, char *String){
+    int i;
+    for(i = 0; i < 20; i++)
+        *(String + i) = *(Grid + 20*(19 - i) + iniCol);
     *(String + i) = '\0';
     return;
 }
@@ -145,7 +163,7 @@ void gridCopy(const char *Grid, char *Copy){
 }
 
 int horizontalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset){
-    int limit = 20 - strlen(String), iniColumn, i = 0, row, key, aux, cont = 0;
+    int limit = 19 - strlen(String), iniColumn, i = 0, row, key, aux, cont = 0;
     srand(time(NULL));
     do{
         row = rand()%20;
@@ -157,7 +175,7 @@ int horizontalWordPlacer(char *Grid, const char *String, const int *exceptList, 
                 key = 0;
         }
     }while(key);
-    iniColumn = rand()%limit;
+    iniColumn = rand()%limit + 1;
     while(*(String + i) != '\0'){
         if(*(Grid + 20*row + iniColumn + i) != *(String + i) && *(Grid + 20*row + iniColumn + i) != '.'){
             i = 0;
@@ -175,19 +193,21 @@ int horizontalWordPlacer(char *Grid, const char *String, const int *exceptList, 
 }
 
 int verticalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset){
-    int limit = 20 - strlen(String), iniRow, i = 0, column, key, aux, cont = 0;
+    int limit = strlen(String), iniRow, i = 0, column, key, aux, cont = 0;
     srand(time(NULL));
     do{
-        column = rand()%20;
+        column = rand()%20;puts("    Teste");
         for(aux = 0; aux < 8; aux++){
-            if(column == *(exceptList + aux)){
+            if(column == *(exceptList + aux) || column == 0){
                 key = 1;
                 break;
             }else
                 key = 0;
         }
     }while(key);
-    iniRow = rand()%limit;
+        do{
+            iniRow = rand()%limit;
+        }while(iniRow == 0);
     while(*(String + i) != '\0'){
         if(*(Grid + 20*(iniRow + i) + column) != '.' && *(Grid + 20*(iniRow + i) + column) != *(String + i)){
             i = 0;
@@ -208,17 +228,8 @@ int verticalWordPlacer(char *Grid, const char *String, const int *exceptList, in
 int firstDiagonalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset){
     int limit = 20 - strlen(String), iniColumn, i = 0, iniRow, key, aux, cont = 0;
     srand(time(NULL));
-    do{
-        iniRow = rand()%limit;
-        iniColumn = rand()%limit;
-        for(aux = 0; aux < 2; aux++){
-            if(iniRow - iniColumn == *(exceptList + aux)){
-                key = 1;
-                break;
-            }else
-                key = 0;
-        }
-    }while(key);
+    iniRow = rand()%limit;
+    iniColumn = rand()%limit;
     while(*(String + i) != '\0'){
         if(*(Grid + 20*(iniRow + i) + iniColumn + i) != *(String + i) && *(Grid + 20*(iniRow + i) + iniColumn + i) != '.'){
             i = 0;
@@ -226,7 +237,17 @@ int firstDiagonalWordPlacer(char *Grid, const char *String, const int *exceptLis
             if(cont > 100){
                 *reset = 1;
                 return(0);
-            }iniColumn = rand()%limit;
+            }do{
+                iniRow = rand()%limit;
+                iniColumn = rand()%limit;
+                for(aux = 0; aux < 2; aux++){
+                    if(iniRow - iniColumn == *(exceptList + aux)){
+                        key = 1;
+                        break;
+                    }else
+                        key = 0;
+                }
+            }while(key);
         }else
             i++;
     }for(i = 0; *(String + i) != '\0'; i++)
@@ -236,7 +257,7 @@ int firstDiagonalWordPlacer(char *Grid, const char *String, const int *exceptLis
 }
 
 int secondDiagonalWordPlacer(char *Grid, const char *String, const int *exceptList, int *reset){
-    int limit = 20 - strlen(String), shift = strlen(String), iniColumn, i = 0, iniRow, key, aux, cont = 0;
+    int limit = 20 - strlen(String), iniColumn, i = 0, iniRow, key, aux, cont = 0;
     srand(time(NULL));
     iniRow = rand()%limit;
     iniColumn = rand()%limit;
@@ -248,9 +269,9 @@ int secondDiagonalWordPlacer(char *Grid, const char *String, const int *exceptLi
                 *reset = 1;
                 return(0);
             }do{
-                iniRow = rand()%limit;
+                iniRow = (unsigned)rand()%limit;
                 do{
-                    iniColumn = rand()%limit + shift;
+                    iniColumn = 20 - (unsigned)rand()%limit;
                 }while(iniColumn == 20);
                 for(aux = 0; aux < 2; aux++){
                     if(iniRow + iniColumn == *(exceptList + aux)){
@@ -276,8 +297,10 @@ void resetList(int *List, const int Dim){
 
 int globalCont = 0;
 
-int randomWord(int *usedWords){
+int randomWord(int *usedWords, const int reset){
     int i, wordPlace, key;
+    if(reset)
+        globalCont = 0;
     srand(time(NULL));
     do{
         wordPlace = (unsigned)rand()%20;

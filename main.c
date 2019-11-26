@@ -15,16 +15,22 @@ int main(void){
     do{
         resetList(usedWords, 20);
         resetList(exceptList, 8);
+        resetList(horizontalWords, 8);
+        resetList(verticalWords, 8);
+        resetList(diagonalWords, 4);
         gridDotFiller(Grid);
 
         for(i = 0; i < 4; i++){
-            horizontalWords[i] = randomWord(usedWords);
+            if(i == 0)
+                horizontalWords[i] = randomWord(usedWords, 1);
+            else
+                horizontalWords[i] = randomWord(usedWords, 0);
             exceptList[i] = horizontalWordPlacer(Grid, *(Nomes + horizontalWords[i]), exceptList, &resetKey);
         }if(resetKey)
             continue;
 
-        for(; i < 8; i++){
-            horizontalWords[i] = randomWord(usedWords);
+        for(i = 4; i < 8; i++){
+            horizontalWords[i] = randomWord(usedWords, 0);
             reverseString(*(Nomes + horizontalWords[i]), Rev);
             exceptList[i] = horizontalWordPlacer(Grid, Rev, exceptList, &resetKey);
         }resetList(exceptList, 8);
@@ -32,13 +38,13 @@ int main(void){
             continue;
 
         for(i = 0; i < 4; i++){
-            verticalWords[i] = randomWord(usedWords);
+            verticalWords[i] = randomWord(usedWords, 0);
             exceptList[i] = verticalWordPlacer(Grid, *(Nomes + verticalWords[i]), exceptList, &resetKey);
         }if(resetKey)
             continue;
 
-        for(; i < 8; i++){
-            verticalWords[i] = randomWord(usedWords);
+        for(i = 4; i < 8; i++){
+            verticalWords[i] = randomWord(usedWords, 0);
             reverseString(*(Nomes + verticalWords[i]), Rev);
             exceptList[i] = verticalWordPlacer(Grid, Rev, exceptList, &resetKey);
         }resetList(exceptList, 2);
@@ -46,14 +52,14 @@ int main(void){
             continue;
 
         for(i = 0; i < 2; i++){
-            diagonalWords[i] = randomWord(usedWords);
+            diagonalWords[i] = randomWord(usedWords, 0);
             exceptList[i] = firstDiagonalWordPlacer(Grid, *(Nomes + diagonalWords[i]), exceptList, &resetKey);
         }resetList(exceptList, 2);
         if(resetKey)
             continue;
 
         for(; i < 4; i++){
-            diagonalWords[i] = randomWord(usedWords);
+            diagonalWords[i] = randomWord(usedWords, 0);
             exceptList[i] = secondDiagonalWordPlacer(Grid, *(Nomes + diagonalWords[i]), exceptList, &resetKey);
         }
 
@@ -83,18 +89,59 @@ int main(void){
             if(patternMatch(Search, *(Nomes + horizontalWords[i]), &auxIndex))
                 break;
             j++;
-        }printf("        nas coordenadas (%d, %d) esta a palavra: %s\n", j + 1, auxIndex + 1, *(Nomes + horizontalWords[i]));
+        }printf("        nas coordenadas (%d, %d) comeca a palavra: %s\n", j + 1, auxIndex + 1, *(Nomes + horizontalWords[i]));
     }
+
     puts("    Orientacao inversa:");
     for(i = 4; i < 8; i++){
         j = 0;
         while(1){
-            transposeRow(Grid, j, Search);
-            reverseString(Search, Rev);
-            if(patternMatch(Rev, *(Nomes + horizontalWords[i]), &auxIndex))
+            transposeReverseRow(Grid, j, Search);
+            if(patternMatch(Search, *(Nomes + horizontalWords[i]), &auxIndex))
                 break;
             j++;
-        }printf("        nas coordenadas (%d, %d) esta a palavra: %s\n", j + 1, 20 - auxIndex, *(Nomes + horizontalWords[i]));
+        }printf("        nas coordenadas (%d, %d) comeca a palavra: %s\n", j + 1, 20 - auxIndex, *(Nomes + horizontalWords[i]));
+    }
+
+    puts("\nPalavras na vertical\n\n    Orientacao normal:");
+    for(i = 0; i < 4; i++){
+        j = 0;
+        while(1){
+            transposeColumn(Grid, j, Search);
+            if(patternMatch(Search, *(Nomes + verticalWords[i]), &auxIndex))
+                break;
+            j++;
+        }printf("        nas coordenadas (%d, %d) comeca a palavra: %s\n", auxIndex + 1, j + 1, *(Nomes + verticalWords[i]));
+    }
+
+    puts("    Orientacao inversa:");
+    for(i = 4; i < 8; i++){
+        j = 0;
+        while(1){
+            transposeReverseColumn(Grid, j, Search);
+            if(patternMatch(Search, *(Nomes + verticalWords[i]), &auxIndex))
+                break;
+            j++;
+        }printf("        nas coordenadas (%d, %d) comeca a palavra: %s\n", 20 - auxIndex, j + 1, *(Nomes + verticalWords[i]));
+    }
+
+    puts("\nPalavras nas diagonais\n\n    Diagonal principal:");
+    for(i = 0; i < 2; i++){
+        j = 0;
+        while(1){
+            allignFirstDiagonal(Grid, j, 0, Search);
+            if(patternMatch(Search, *(Nomes + diagonalWords[i]), &auxIndex)){
+                aux = 1;
+                break;
+            }allignFirstDiagonal(Grid, 0, j, Search);
+            if(patternMatch(Search, *(Nomes + diagonalWords[i]), &auxIndex)){
+                aux = 2;
+                break;
+            }j++;
+        }if(aux == 1)
+            printf("        nas coordenadas (%d, %d) comeca a palavra: %s\n", j + auxIndex + 1, auxIndex + 1, *(Nomes + diagonalWords[i]));
+        else
+            printf("        nas coordenadas (%d, %d) comeca a palavra: %s\n", auxIndex + 1, j + auxIndex + 1, *(Nomes + diagonalWords[i]));
     }
 
     system("Pause");
